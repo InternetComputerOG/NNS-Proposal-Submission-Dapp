@@ -1,0 +1,6 @@
+// Version: 1.0.0
+actor {
+  stable var balancesEntries : [(Principal, Nat)];
+  stable var neuronCT : Nat;
+  stable var ownersEntries : [(Nat, Principal)]
+};
