@@ -5,6 +5,7 @@
   import { faCopy } from '@fortawesome/free-solid-svg-icons';
   import CanisterIds from "./components/CanisterIds.svelte";
   import Wallet from "./components/Wallet.svelte";
+  import ProposalForm from "./components/ProposalForm.svelte";
   import Links from "./components/Links.svelte";
 
   // Add fontawesome icons
@@ -21,10 +22,11 @@
   >
     <img src="images/dfinity.svg" alt="DFINITY logo" />
   </a>
-  <h1>Transferable Neuron dApp</h1>
+  <h1>NNS Proposal Submission dApp</h1>
   <Auth />
   {#if $auth.loggedIn}
     <Wallet />
+    <ProposalForm />
   {/if}
   <Links />
   <CanisterIds />
