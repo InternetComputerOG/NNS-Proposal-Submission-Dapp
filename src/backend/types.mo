@@ -1,5 +1,5 @@
 // ----------- Decription
-// This Motoko file contains the logic of our backend canister.
+// This Motoko file contains the custom types we need for our main.mo logic.
 
 // ----------- Imports
 
@@ -14,6 +14,17 @@ module {
         principal : Principal;
         address : [Nat8];
         balance : Nat64;
-    }
+    };
+
+    public type ProposalSubmission = {
+        title : Text;
+        action : Text;
+        url : Text;
+        summary : Text;
+        motion : Text;
+        knownNeuronID : Nat;
+        knownNeuronName : Text;
+        knownNeuronDescription : Text;
+    };
 
 }

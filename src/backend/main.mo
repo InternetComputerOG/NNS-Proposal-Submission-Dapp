@@ -77,8 +77,8 @@ shared(init_msg) actor class TransferableNeurons() = this {
        await withdrawICP(msg.caller, account_id); 
     };
 
-    public func generateNNSAccount(principal : Text, neuronCT : Nat) : async [Nat8] {
-        getNNSAccount(Principal.fromText(principal), neuronCT);
+    public shared(msg) func submitNNSProposal(proposal : T.ProposalSubmission) : async Text {
+        await submitProposal(proposal);
     };
 
     ///////////////////////
@@ -124,29 +124,8 @@ shared(init_msg) actor class TransferableNeurons() = this {
         });
     };
 
-    private func getNNSSubaccount(principal : Principal, neuronCT : Nat) : Blob {
-        let hash = SHA224.Digest();
-        hash.write([0x0C]);
-        hash.write(Blob.toArray(Text.encodeUtf8("neuron-stake")));
-        hash.write(Blob.toArray(Principal.toBlob(Principal.fromActor(this))));
-        hash.write(Array.freeze(Array.init<Nat8>(8,0)));
-    
-        let hashSum = hash.sum();
-        //func beBytes(n: Nat32) : [Nat8] {
-        //    func byte(n: Nat32) : Nat8 {
-        //        Nat8.fromNat(Nat32.toNat(n & 0xff))
-        //    };
-        //    [byte(n >> 24), byte(n >> 16), byte(n >> 8), byte(n)]
-        //};
-        //let crc32Bytes = beBytes(CRC32.ofArray(hashSum));
-        let blob = Blob.fromArray(hashSum);
-
-        return blob;
-    };
-
-    private func getNNSAccount(principal : Principal, neuronCT : Nat) : [Nat8] {
-        let nnsSubaccount : Account.Subaccount = getNNSSubaccount(principal, neuronCT);
-        Blob.toArray(Account.accountIdentifier(Principal.fromActor(Governance), nnsSubaccount));
+    private func submitProposal(proposal: T.ProposalSubmission) : async Text {
+        return "Test!";
     };
 
     //////////////////////

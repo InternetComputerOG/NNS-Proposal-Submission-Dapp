@@ -2,11 +2,16 @@
     import { onMount } from "svelte";
     import { FontAwesomeIcon } from 'fontawesome-svelte';
     import { auth } from "../store/auth";
+    import { balance } from "../store/balance";
     import { toHexString, hexToBytes, principalToAccountDefaultIdentifier, accountIdentifierFromBytes, accountIdentifierToBytes, asciiStringToByteArray } from '../utils/helpers';
     import { AccountIdentifier, LedgerCanister, ICP } from "@dfinity/nns";
     import App from "../App.svelte";
     import Auth from "./Auth.svelte";
     import CanisterIds from "./CanisterIds.svelte";
+    import ProposalForm from "./ProposalForm.svelte";
+    import FontAwesomeLayers from "fontawesome-svelte/src/FontAwesomeLayers.svelte";
+    import FontAwesomeLayersText from "fontawesome-svelte/src/FontAwesomeLayersText.svelte";
+    import Links from "./Links.svelte";
 
     // Global variables
     let userPrincipal;
@@ -44,6 +49,9 @@
       userPrincipal = userInfo.principal;
       depositAddress = accountIdentifierFromBytes(userInfo.address);
       userBalance = parseFloat((Number(userInfo.balance) / 100000000).toFixed(4));
+      balance.update(() => ({
+        ICP: userBalance,
+      }));
 
       fetchingUserInfo = false;
     };
@@ -52,6 +60,10 @@
       pendingBalanceRefresh = true;
       let newBalance = await $auth.actor.balance();
       userBalance = parseFloat((Number(newBalance) / 100000000).toFixed(4));
+      balance.update(() => ({
+        ICP: userBalance,
+      }));
+
       pendingBalanceRefresh = false;
     };
 
@@ -125,7 +137,7 @@
         {:else}
           {userBalance}
         {/if}
-        <button on:click={refreshBalance}>Refresh</button>
+        <button on:click={refreshBalance}>↻ Refresh</button>
         <button on:click={() => hideWithdrawForm = !hideWithdrawForm} class:hide={userBalance <= 0.0001}>
           {#if hideWithdrawForm}
             Withdraw
@@ -141,6 +153,12 @@
             <input bind:value={withdrawalAddress}><button on:click={withdrawICP(withdrawalAddress)}>Withdraw <strong>{userBalance - 0.0001}</strong> ICP</button>
           {/if}
         </div>
+        <br/>
+        {#if userBalance < 12}
+          <h6>You need to deposit {12 - userBalance} ICP to submit a Proposal.</h6>
+        {:else}
+          <h6>You will have {userBalance - 12} ICP left after submitting a Proposal.</h6>
+        {/if}
       </div>
     {/if}
     <!-- <input bind:value={testNNSPrincipal}><br/>
@@ -175,5 +193,19 @@
 
     .copy-icon:hover {
         color: #d4d4d4;
+        cursor: copy;
+    }
+
+    input {
+        padding: 12px;
+        width: 80%;
+        border-radius: 6px;
+    }
+
+    @media (min-width: 640px) {
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
     }
   </style>

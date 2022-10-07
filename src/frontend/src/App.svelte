@@ -14,22 +14,26 @@
 </script>
 
 <main>
-  <a
-    href="https://dfinity.org"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="logo"
-  >
-    <img src="images/dfinity.svg" alt="DFINITY logo" />
-  </a>
-  <h1>NNS Proposal Submission dApp</h1>
-  <Auth />
+  <div class="container">
+    <a
+      href="https://dfinity.org"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="logo"
+    >
+      <img src="images/dfinity.svg" alt="DFINITY logo" />
+    </a>
+    <h1>NNS Proposal Submission dApp</h1>
+    <Auth />
+  </div>
   {#if $auth.loggedIn}
     <Wallet />
     <ProposalForm />
   {/if}
-  <Links />
-  <CanisterIds />
+  <div class="container">
+    <Links />
+    <CanisterIds />
+  </div>
 </main>
 
 <style>
@@ -55,7 +59,7 @@
   }
 
   @media (min-width: 640px) {
-    main {
+    .container {
       max-width: 800px;
       margin: 0 auto;
     }

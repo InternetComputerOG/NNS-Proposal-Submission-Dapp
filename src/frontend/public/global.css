@@ -30,6 +30,10 @@ a:hover {
   text-decoration: underline;
 }
 
+h6 {
+  margin: 5px 0;
+}
+
 button {
   margin: 10px;
   padding: 8px 32px;
@@ -43,6 +47,15 @@ button {
   font-weight: 300;
   border: none;
   cursor: pointer;
+}
+
+button:disabled {
+  color:#161617;
+  background-color:grey;
+}
+
+button:disabled:hover {
+  cursor: not-allowed;
 }
 
 button.outline {
