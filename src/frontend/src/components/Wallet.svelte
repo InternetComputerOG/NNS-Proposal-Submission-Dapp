@@ -18,7 +18,7 @@
     let userBalance;
     let depositAddress;
     let withdrawalAddress;
-
+    
     let testNNSPrincipal = "";
     let testNNSNonce = 0;
     let testNNSaccount;
@@ -32,7 +32,7 @@
     let didCopyDepositAddress = false;
 
     // UI Variables
-   
+    let withdrawalResult = "";
 
     onMount(async () => {
       if($auth.loggedIn) {
@@ -71,9 +71,8 @@
       pendingWithdrawal = true;
       console.log(address);
       console.log(AccountIdentifier.fromHex(address).bytes);
-      let withdrawalResult = await $auth.actor.withdraw(AccountIdentifier.fromHex(address).bytes);
+      withdrawalResult = await $auth.actor.withdraw(AccountIdentifier.fromHex(address).bytes);
       console.log(withdrawalResult);
-
       hideWithdrawForm = true;
       pendingWithdrawal = false;
       refreshBalance();
@@ -155,20 +154,21 @@
         </div>
         <br/>
         {#if userBalance < 12}
-          <h6>You need to deposit {12 - userBalance} ICP to submit a Proposal.</h6>
+          <h6>You need to deposit {parseFloat(12 - userBalance).toFixed(4)} ICP to submit a Proposal.</h6>
         {:else}
-          <h6>You will have {userBalance - 12} ICP left after submitting a Proposal.</h6>
+          <h6>You will have {parseFloat(userBalance - 12).toFixed(4)} ICP left after submitting a Proposal.</h6>
         {/if}
       </div>
     {/if}
-    <!-- <input bind:value={testNNSPrincipal}><br/>
-    <input type=number bind:value={testNNSNonce}>
-    <button on:click={fetchNNSAccount(testNNSPrincipal, testNNSNonce)}></button>
-    {testNNSaccount} -->
+    {#if withdrawalResult != ""}
+        <div class="withdrawal-result">
+            {withdrawalResult}
+        </div>
+    {/if}
   </div>
   
   <style>
-    .container {
+    .container, .withdrawal-result {
       margin: 30px 0;
       border: 2px solid #fff;
       padding: 15px;

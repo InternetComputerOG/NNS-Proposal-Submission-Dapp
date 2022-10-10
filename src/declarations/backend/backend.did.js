@@ -14,24 +14,11 @@ export const idlFactory = ({ IDL }) => {
     'balance' : IDL.Nat64,
     'address' : IDL.Vec(IDL.Nat8),
   });
-  const BlockIndex = IDL.Nat64;
-  const Tokens = IDL.Record({ 'e8s' : IDL.Nat64 });
-  const TransferError = IDL.Variant({
-    'TxTooOld' : IDL.Record({ 'allowed_window_nanos' : IDL.Nat64 }),
-    'BadFee' : IDL.Record({ 'expected_fee' : Tokens }),
-    'TxDuplicate' : IDL.Record({ 'duplicate_of' : BlockIndex }),
-    'TxCreatedInFuture' : IDL.Null,
-    'InsufficientFunds' : IDL.Record({ 'balance' : Tokens }),
-  });
-  const TransferResult = IDL.Variant({
-    'Ok' : BlockIndex,
-    'Err' : TransferError,
-  });
   const TransferableNeurons = IDL.Service({
     'balance' : IDL.Func([], [IDL.Nat64], []),
     'submitNNSProposal' : IDL.Func([ProposalSubmission], [IDL.Text], []),
     'userInfo' : IDL.Func([], [UserInfo], []),
-    'withdraw' : IDL.Func([IDL.Vec(IDL.Nat8)], [TransferResult], []),
+    'withdraw' : IDL.Func([IDL.Vec(IDL.Nat8)], [IDL.Text], []),
   });
   return TransferableNeurons;
 };

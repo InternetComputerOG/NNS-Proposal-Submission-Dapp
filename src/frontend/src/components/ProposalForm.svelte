@@ -83,7 +83,9 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
         pendingSubmit = true;
 
         let result = await $auth.actor.submitNNSProposal(proposal);
+        console.log(result);
         resultMessage = result;
+
 
         pendingSubmit = false;
     };
@@ -99,7 +101,7 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
             knownNeuronDescription: false,
         };
 
-        if (balance < 12) {
+        if (balance < 0.12) {
             canSubmitError = "*not enough ICP";
             return false;
 
@@ -138,8 +140,9 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
   
 <div class="proposal-form">
     <h2>Submit A New Proposal To The NNS</h2>
-    The 12 ICP fee covers the 10 ICP burn penalty if your proposal gets rejected, with any remaining amount contributing to the cycles and time needed to maintain this interface.
-    
+    The 10 ICP fee is sent to the dapp's neuron (<a href="https://dashboard.internetcomputer.org/neuron/9383571398983269667" target="_blank">9383571398983269667</a>) to cover the 10 ICP burn penalty that will be applied if your proposal gets rejected. This ICP is locked into the neuron, so even if your proposal is adopted you cannot be refunded. Maturity from this neuron is used to provide the cycles and maintenance needed to keep this service available.
+    <br/><br/>
+    This dapp makes submitting NNS proposals easy for non-technical users with the lowest cost possible. If you'd like to learn how to re-create this interface using a neuron that you control, check out the code on <a href="https://github.com/InternetComputerOG/NNS-Proposal-Submission-Dapp" target="_blank">GitHub</a>.
     <h4>Title</h4>
     <input bind:value={proposal.title} class:error-highlight={errorHighlight.title}>
     
@@ -175,19 +178,19 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
     <button class="proposal-submit-btn" on:click={submitProposal(proposal)} disabled={!canSubmit($balance.ICP, proposal)}>Submit Proposal</button>
     <br/>
     {#if $balance.ICP < 12}
-        You need to deposit {12 - $balance.ICP} ICP to submit a Proposal.
+        You need to deposit {parseFloat(12 - $balance.ICP).toFixed(4)} ICP to submit a Proposal.
     {:else if $balance.ICP >= 12}
-        You will have {$balance.ICP - 12} ICP left after submitting a Proposal.
+        You will have {parseFloat($balance.ICP - 12).toFixed(4)} ICP left after submitting a Proposal.
     {/if}
     <h6 class="pre-submit-error-message">{canSubmitError}</h6>
     {#if formSubmitted}
-    <div class="submission-result">
-        {#if pendingSubmit}
-            <div class="loader"></div> Submitting your proposal...
-        {:else}
-            {resultMessage}
-        {/if}
-    </div>
+        <div class="submission-result">
+            {#if pendingSubmit}
+                <div class="loader"></div> Submitting your proposal...
+            {:else}
+                {resultMessage}
+            {/if}
+        </div>
     {/if}
     
 </div>

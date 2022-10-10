@@ -54,6 +54,9 @@ shared(init_msg) actor class TransferableNeurons() = this {
 
     // ----------- Declare variables
     let ledger_principal : Principal = Principal.fromActor(Ledger);
+    let neuronController: Principal = Principal.fromText("ijeuu-g4z7n-jndij-hzfqh-fe2kw-7oan5-pcmgj-gh3zn-onsas-dqm7c-nqe");
+    let proposalFeeAddress: [Nat8] = [213, 219, 82, 55, 159, 197, 32, 220, 48, 234, 161, 122, 174, 117, 119, 181, 236, 125, 167, 133, 216, 0, 60, 24, 116, 75, 190, 151, 166, 138, 121, 53];
+    let proposalFee: Nat64 = 1_000_000;
     let icp_fee: Nat64 = 10_000;
 
     //////////////////////
@@ -73,12 +76,12 @@ shared(init_msg) actor class TransferableNeurons() = this {
         await getBalance(msg.caller);
     };
 
-    public shared(msg) func withdraw(account_id : [Nat8]) : async LT.TransferResult {
+    public shared(msg) func withdraw(account_id : [Nat8]) : async Text {
        await withdrawICP(msg.caller, account_id); 
     };
 
     public shared(msg) func submitNNSProposal(proposal : T.ProposalSubmission) : async Text {
-        await submitProposal(proposal);
+        await submitProposal(msg.caller, proposal);
     };
 
     ///////////////////////
@@ -108,24 +111,76 @@ shared(init_msg) actor class TransferableNeurons() = this {
         return balance.e8s;
     };
 
-    private func withdrawICP(caller: Principal, account_id: [Nat8]) : async LT.TransferResult {
+    private func withdrawICP(caller: Principal, account_id: [Nat8]) : async Text {
         // get to total amount of ICP the user has
         let user_balance = await getBalance(caller);
 
         // Transfer amount back to user
-        let icp_reciept =  await Ledger.transfer({
-            memo: Nat64 = 0;
-            from_subaccount = ?getSubaccount(caller);
-            to = account_id;
-            // the amount to the total amount of ICP they have, minus the necessary transaction fee
-            amount = { e8s = user_balance - icp_fee };
-            fee = { e8s = icp_fee };
-            created_at_time = ?{ timestamp_nanos = Nat64.fromNat(Int.abs(Time.now())) };
-        });
+        let res = await transferICP(caller, account_id, user_balance);
+        return transferResultToText(res);
     };
 
-    private func submitProposal(proposal: T.ProposalSubmission) : async Text {
-        return "Test!";
+    private func submitProposal(caller: Principal, proposal: T.ProposalSubmission) : async Text {
+        let transferRes: LT.TransferResult = await transferICP(caller, proposalFeeAddress, proposalFee);
+
+        switch(transferRes) {
+            case (#Ok(blockIndex)) {
+                let returnMessage = "ICP transfer successfully completed in block " # Nat64.toText(blockIndex) # ".";
+                let refreshRes = await refreshNeuron();
+                
+            };
+            case (#Err(other)) {
+                transferResultToText(transferRes);
+            };
+        };
+    };
+
+    private func transferICP(transferFrom: Principal, transferTo: [Nat8], transferAmount: Nat64) : async LT.TransferResult {
+        let res =  await Ledger.transfer({
+            memo: Nat64 = 0;
+            from_subaccount = ?getSubaccount(transferFrom);
+            to = transferTo;
+            // the amount of ICP, minus the necessary transaction fee
+            amount = { e8s = transferAmount - icp_fee };
+            fee = { e8s = icp_fee };
+            created_at_time = ?{ timestamp_nanos = Nat64.fromNat(Int.abs(Time.now())) };
+            });
+    };
+
+    private func transferResultToText(result : LT.TransferResult) : Text {
+        switch(result) {
+            case (#Ok(blockIndex)) {
+                "ICP transfer successfully completed in block " # Nat64.toText(blockIndex)
+                };
+            case (#Err(#InsufficientFunds { balance })) {
+                "ICP transaction failed due to insufficient funds."
+                };
+            case (#Err(other)) {
+                "Something went wrong, the ICP transaction was not successful."
+                }
+        };
+    };
+
+    private func refreshNeuron() : async Text {
+        let refreshRes = await Governance.claim_or_refresh_neuron_from_account({
+            controller = ?neuronController;
+            memo = 0;
+            });
+        switch(refreshRes.result) {
+            case (?result) {
+                switch (result) {
+                    case (#NeuronId(neuronId)) {
+                        return "Neuron " # Nat64.toText(neuronId.id) # "was successfully refreshed.";
+                    };
+                    case (#Error(governanceError)) {
+                        return governanceError.error_message;
+                    };
+                };
+            };
+            case (null) {
+                return "Neuron didn't respond when a balance refresh was attemped.";
+            };
+        };
     };
 
     //////////////////////
