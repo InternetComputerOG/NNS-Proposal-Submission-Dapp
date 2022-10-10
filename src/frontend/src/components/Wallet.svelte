@@ -153,10 +153,10 @@
           {/if}
         </div>
         <br/>
-        {#if userBalance < 12}
-          <h6>You need to deposit {parseFloat(12 - userBalance).toFixed(4)} ICP to submit a Proposal.</h6>
+        {#if userBalance < 10}
+          <h6>You need to deposit {parseFloat(10 - userBalance).toFixed(4)} ICP to submit a Proposal.</h6>
         {:else}
-          <h6>You will have {parseFloat(userBalance - 12).toFixed(4)} ICP left after submitting a Proposal.</h6>
+          <h6>You will have {parseFloat(userBalance - 10).toFixed(4)} ICP left after submitting a Proposal.</h6>
         {/if}
       </div>
     {/if}

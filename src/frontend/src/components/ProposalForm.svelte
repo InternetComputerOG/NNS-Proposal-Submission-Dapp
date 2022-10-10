@@ -49,8 +49,8 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
     };
 
     let proposalActionOptions = [
-        'Motion',
-        'Register Known Neuron'
+        'Motion'/*,
+        'Register Known Neuron'*/
     ];
 
     // Other Variables
@@ -76,6 +76,7 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
 > Anyone can use this Dapp to submit a proposal by filling out the form and paying a fee, so the source of this proposal cannot be verified. Please keep this in mind and vote responsibly.
 ---
 `;
+    marked.setOptions({ "linksInNewTab" : true });
 
     async function submitProposal(proposal) {
         console.log(proposal);
@@ -84,7 +85,7 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
 
         let result = await $auth.actor.submitNNSProposal(proposal);
         console.log(result);
-        resultMessage = result;
+        resultMessage = marked(result);
 
 
         pendingSubmit = false;
@@ -101,7 +102,7 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
             knownNeuronDescription: false,
         };
 
-        if (balance < 0.12) {
+        if (balance < 10) {
             canSubmitError = "*not enough ICP";
             return false;
 
@@ -177,10 +178,10 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
 
     <button class="proposal-submit-btn" on:click={submitProposal(proposal)} disabled={!canSubmit($balance.ICP, proposal)}>Submit Proposal</button>
     <br/>
-    {#if $balance.ICP < 12}
-        You need to deposit {parseFloat(12 - $balance.ICP).toFixed(4)} ICP to submit a Proposal.
-    {:else if $balance.ICP >= 12}
-        You will have {parseFloat($balance.ICP - 12).toFixed(4)} ICP left after submitting a Proposal.
+    {#if $balance.ICP < 10}
+        You need to deposit {parseFloat(10 - $balance.ICP).toFixed(4)} ICP to submit a Proposal.
+    {:else if $balance.ICP >= 10}
+        You will have {parseFloat($balance.ICP - 10).toFixed(4)} ICP left after submitting a Proposal.
     {/if}
     <h6 class="pre-submit-error-message">{canSubmitError}</h6>
     {#if formSubmitted}
@@ -188,7 +189,7 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
             {#if pendingSubmit}
                 <div class="loader"></div> Submitting your proposal...
             {:else}
-                {resultMessage}
+                {@html resultMessage}
             {/if}
         </div>
     {/if}
