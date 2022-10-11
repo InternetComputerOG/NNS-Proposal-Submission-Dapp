@@ -17,6 +17,7 @@ type ProposalSubmission =
  };
 service : {
   balance: () -> (nat64);
+  isOwner: () -> (bool);
   submitNNSProposal: (ProposalSubmission) -> (text);
   userInfo: () -> (UserInfo);
   withdraw: (vec nat8) -> (text);

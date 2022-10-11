@@ -43,14 +43,14 @@ Lorem Ipsum
 
 Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-proposal/9392/3`,
         motion: "",
-        knownNeuronID: 0,
+        knownNeuronID: BigInt(0),
         knownNeuronName: "",
         knownNeuronDescription: ""
     };
 
     let proposalActionOptions = [
-        'Motion'/*,
-        'Register Known Neuron'*/
+        'Motion',
+        'Register Known Neuron'
     ];
 
     // Other Variables
@@ -65,20 +65,23 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
     let canSubmitError = "";
     let formSubmitted = false;
     let pendingSubmit = false;
+    let rawNeuronID = "";
     let resultMessage = "";
     let disclaimer = `
+
 ---
 > ### Disclaimer
-> This proposal was submitted using the NN Proposal Submission Dapp created by [Isaac Valadez](https://isaac.icp.page/).
+> This proposal was submitted using the NNS Proposal Submission Dapp. Anyone can use this Dapp to submit a proposal by filling out the form and paying a fee, so the source of this proposal cannot be verified. Please keep this in mind and vote responsibly.
 > - Website: [nnsproposal.icp.xyz](https://nnsproposal.icp.xyz/) or [uf2fn-liaaa-aaaal-abeba-cai.ic0.app](https://uf2fn-liaaa-aaaal-abeba-cai.ic0.app/)
 > - GitHub: [github.com/InternetComputerOG/NNS-Proposal-Submission-Dapp](https://github.com/InternetComputerOG/NNS-Proposal-Submission-Dapp)
-> 
-> Anyone can use this Dapp to submit a proposal by filling out the form and paying a fee, so the source of this proposal cannot be verified. Please keep this in mind and vote responsibly.
+> - Created by [Isaac](https://isaac.icp.page/).
 ---
-`;
-    marked.setOptions({ "linksInNewTab" : true });
 
-    async function submitProposal(proposal) {
+`;
+    let ownerLoggedIn = false;
+
+    async function submitProposal(proposal, rawID) {
+        proposal.knownNeuronID = BigInt(rawID);
         console.log(proposal);
         formSubmitted = true;
         pendingSubmit = true;
@@ -91,7 +94,7 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
         pendingSubmit = false;
     };
 
-    function canSubmit(balance, proposal) {
+    function canSubmit(balance, proposal, rawNeuronID) {
         canSubmitError = "";
         errorHighlight = {
             title: false,
@@ -122,7 +125,7 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
             return false;
 
         } else if (proposal.action == "Register Known Neuron") {
-            if (proposal.knownNeuronID == "") {
+            if (rawNeuronID == "") {
                 canSubmitError = "*you need to add a Known Neuron ID to your proposal";
                 errorHighlight.knownNeuronID = true;
                 return false;
@@ -134,9 +137,9 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
         }
 
         return true;
+
+        
     };
-
-
 </script>
   
 <div class="proposal-form">
@@ -156,6 +159,7 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
     {/each}
     
     <h4>URL</h4>
+    We strongly encourage all that proposals include the URL to a coorresponding topic on the <a href="https://forum.dfinity.org/c/governance/" target="_blank">DFINITY Dev Forum</a> so that it can be discussed by the community during the voting phase.
     <input bind:value={proposal.url} class:error-highlight={errorHighlight.url}>
     
     <h4>Summary</h4>
@@ -167,7 +171,7 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
         <input bind:value={proposal.motion}>
     {:else if proposal.action == "Register Known Neuron"}
         <h4>Known Neuron ID</h4>
-        <input type=number bind:value={proposal.knownNeuronID} class:error-highlight={errorHighlight.knownNeuronID}>
+        <input bind:value={rawNeuronID} class:error-highlight={errorHighlight.knownNeuronID}>
 
         <h4>Known Neuron Name</h4>
         <input bind:value={proposal.knownNeuronName} class:error-highlight={errorHighlight.knownNeuronName}>
@@ -175,8 +179,16 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
         <h4>Known Neuron Description</h4>
         <input bind:value={proposal.knownNeuronDescription}>
     {/if}
-
-    <button class="proposal-submit-btn" on:click={submitProposal(proposal)} disabled={!canSubmit($balance.ICP, proposal)}>Submit Proposal</button>
+    <div class="anti-spam-message">
+        <h4>Dear Spammers</h4>
+        If you are about to use my dapp to spam the NNS, I respectfully ask that you first take a long hard look in the mirror. Think about how your life got to this point, where your most noteworthy contribution to the world is creating digital trash that better people will need to clean up.
+        <br/><br/>Your punishment for spamming the NNS will be the knowledge that you are living the life of a small-minded internet troll. I recommend that you read a book and wait until you actually have something meaningful to contribute, because the world has enough trolls. What we need now is builders, and it's never too late to become the kind of person who can change the world for the better.<br/><br/>You should be ashamed of yourself, because you can be better than this.
+        <br/>
+        <h5>Don't Spam The NNS.</h5>
+        Sincerely,<br/>
+        -Isaac
+    </div>
+    <button class="proposal-submit-btn" on:click={submitProposal(proposal, rawNeuronID)} disabled={!canSubmit($balance.ICP, proposal, rawNeuronID)}>Submit Proposal</button>
     <br/>
     {#if $balance.ICP < 10}
         You need to deposit {parseFloat(10 - $balance.ICP).toFixed(4)} ICP to submit a Proposal.
@@ -198,7 +210,9 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
 <div class="proposal-preview">
     <h2>Proposal Preview</h2>
     {@html marked(
-        "# " + proposal.title + " | " + proposal.action + " (nnsproposal.icp.xyz)" + disclaimer + proposal.summary
+        "# " + proposal.action + " | " + proposal.title + " (nnsproposal.icp.xyz)" + `
+
+` + proposal.summary + disclaimer
     )}
 </div>
 
@@ -251,6 +265,10 @@ Developer forum URL: https://forum.dfinity.org/t/long-term-r-d-tokenomics-propos
 
     .submission-result {
         max-width: 80%;
+    }
+
+    .anti-spam-message {
+        margin-top: 25px;
     }
 
     @media (max-width: 640px) {

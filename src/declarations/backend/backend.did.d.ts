@@ -13,6 +13,7 @@ export interface ProposalSubmission {
 }
 export interface TransferableNeurons {
   'balance' : ActorMethod<[], bigint>,
+  'isOwner' : ActorMethod<[], boolean>,
   'submitNNSProposal' : ActorMethod<[ProposalSubmission], string>,
   'userInfo' : ActorMethod<[], UserInfo>,
   'withdraw' : ActorMethod<[Array<number>], string>,

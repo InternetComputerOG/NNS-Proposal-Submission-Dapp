@@ -16,6 +16,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const TransferableNeurons = IDL.Service({
     'balance' : IDL.Func([], [IDL.Nat64], []),
+    'isOwner' : IDL.Func([], [IDL.Bool], []),
     'submitNNSProposal' : IDL.Func([ProposalSubmission], [IDL.Text], []),
     'userInfo' : IDL.Func([], [UserInfo], []),
     'withdraw' : IDL.Func([IDL.Vec(IDL.Nat8)], [IDL.Text], []),

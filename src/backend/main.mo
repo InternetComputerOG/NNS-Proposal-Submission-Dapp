@@ -7,6 +7,7 @@
 import Array        "mo:base/Array";
 import Blob         "mo:base/Blob";
 import Buffer       "mo:base/Buffer";
+import Bool         "mo:base/Buffer";
 import Char         "mo:base/Char";
 import Debug        "mo:base/Debug";
 import Hash         "mo:base/Hash";
@@ -54,23 +55,24 @@ shared(init_msg) actor class TransferableNeurons() = this {
     let Governance = actor "rrkah-fqaaa-aaaaa-aaaaq-cai" : GT.Service;
 
     // ----------- Declare variables
-    let ledger_principal : Principal = Principal.fromActor(Ledger);
+    let ledger_principal: Principal = Principal.fromActor(Ledger);
+    let owner: Principal = Principal.fromText("gsyn2-nsn7e-4p7mr-d7k57-7on37-f6azw-5p7dy-boeh6-lks7m-s4vyv-4ae");
     let neuronController: Principal = Principal.fromText("ijeuu-g4z7n-jndij-hzfqh-fe2kw-7oan5-pcmgj-gh3zn-onsas-dqm7c-nqe");
     let neuronId: GT.NeuronId = { 
-        id : Nat64 = 9383571398983269667;
+        id: Nat64 = 9383571398983269667;
     };
     let proposalFeeAddress: [Nat8] = [213, 219, 82, 55, 159, 197, 32, 220, 48, 234, 161, 122, 174, 117, 119, 181, 236, 125, 167, 133, 216, 0, 60, 24, 116, 75, 190, 151, 166, 138, 121, 53];
     let proposalFee: Nat64 = 1_000_000_000;
     let icp_fee: Nat64 = 10_000;
     let newLine: Text = Char.toText(Char.fromNat32(10));
-    var disclaimer: Text = newLine;
+    var disclaimer: Text = newLine # newLine;
     disclaimer #= "--- " # newLine;
-    disclaimer #= "### Disclaimer" # newLine;
-    disclaimer #= "This proposal was submitted using the NN Proposal Submission Dapp created by [Isaac Valadez](https://isaac.icp.page/)." # newLine;
+    disclaimer #= "> ### Disclaimer" # newLine;
+    disclaimer #= "> This proposal was submitted using the NNS Proposal Submission Dapp. Anyone can use this Dapp to submit a proposal by filling out the form and paying a fee, so the source of this proposal cannot be verified. Please keep this in mind and vote responsibly." # newLine;
     disclaimer #= "> - Website: [nnsproposal.icp.xyz](https://nnsproposal.icp.xyz/) or [uf2fn-liaaa-aaaal-abeba-cai.ic0.app](https://uf2fn-liaaa-aaaal-abeba-cai.ic0.app/)" # newLine;
     disclaimer #= "> - GitHub: [github.com/InternetComputerOG/NNS-Proposal-Submission-Dapp](https://github.com/InternetComputerOG/NNS-Proposal-Submission-Dapp)" # newLine;
-    disclaimer #= "> " # newLine # "> Anyone can use this Dapp to submit a proposal by filling out the form and paying a fee, so the source of this proposal cannot be verified. Please keep this in mind and vote responsibly." # newLine;
-    disclaimer #= "--- " # newLine;
+    disclaimer #= "> - Created by [Isaac](https://isaac.icp.page/)." # newLine;
+    disclaimer #= "--- " # newLine # newLine;
 
     //////////////////////
     // Public Functions //
@@ -78,9 +80,18 @@ shared(init_msg) actor class TransferableNeurons() = this {
     // ----------- Query Functions
     //
     
+    
    
     // ----------- Call Functions
     // 
+    public shared(msg) func isOwner() : async Bool {
+        if (msg.caller == owner) {
+            true;
+        } else {
+            false;
+        }
+    };
+
     public shared(msg) func userInfo() : async T.UserInfo {
         await getUserInfo(msg.caller);
     };
@@ -199,8 +210,8 @@ shared(init_msg) actor class TransferableNeurons() = this {
 
     private func makeProposal (proposal: T.ProposalSubmission) : async Text {
         let proposalAction = createAction(proposal);
-        let proposalTitle = proposal.title # " | " # proposal.action # " (nnsproposal.icp.xyz)";
-        let proposalSummary = disclaimer # proposal.summary;
+        let proposalTitle = proposal.action # " | " # proposal.title # " (nnsproposal.icp.xyz)";
+        let proposalSummary = proposal.summary # disclaimer;
 
         let makeProposalCommand: GT.Command = #MakeProposal({
             url = proposal.url;
