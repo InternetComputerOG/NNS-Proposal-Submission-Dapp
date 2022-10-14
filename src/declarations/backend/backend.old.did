@@ -28,11 +28,7 @@ type SubmissionResponse =
    block: nat64;
    proposalId: nat64;
  };
-type SubmissionError = 
- record {
-   reason: text;
-   transferError: opt TransferError;
- };
+type SubmissionError = record {reason: text;};
 type ProposalSubmission = 
  record {
    action: text;

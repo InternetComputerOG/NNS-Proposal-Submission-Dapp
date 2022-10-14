@@ -119,7 +119,7 @@ SUCCESS
 ---
 - ICP transaction succeeded in block ` + result.Ok.block + `
 - Neuron 9383571398983269667 refresh succeeded.
-- Proposal (` + result.Ok.proposalId + `)[https://dashboard.internetcomputer.org/proposal/` + result.Ok.proposalId + `] successfully created!
+- Proposal [` + result.Ok.proposalId + `](https://dashboard.internetcomputer.org/proposal/` + result.Ok.proposalId + `) successfully created!
 `);
       } else if(result.Err.reason == "ERROR1") {
         resultMessage = marked(error1);
