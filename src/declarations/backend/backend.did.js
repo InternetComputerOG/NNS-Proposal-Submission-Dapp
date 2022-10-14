@@ -9,18 +9,43 @@ export const idlFactory = ({ IDL }) => {
     'motion' : IDL.Text,
     'knownNeuronID' : IDL.Nat,
   });
+  const SubmissionResponse = IDL.Record({
+    'block' : IDL.Nat64,
+    'proposalId' : IDL.Nat64,
+  });
+  const SubmissionError = IDL.Record({ 'reason' : IDL.Text });
+  const SubmissionResult = IDL.Variant({
+    'Ok' : SubmissionResponse,
+    'Err' : SubmissionError,
+  });
   const UserInfo = IDL.Record({
     'principal' : IDL.Principal,
     'balance' : IDL.Nat64,
     'address' : IDL.Vec(IDL.Nat8),
   });
-  const TransferableNeurons = IDL.Service({
-    'balance' : IDL.Func([], [IDL.Nat64], []),
-    'isOwner' : IDL.Func([], [IDL.Bool], []),
-    'submitNNSProposal' : IDL.Func([ProposalSubmission], [IDL.Text], []),
-    'userInfo' : IDL.Func([], [UserInfo], []),
-    'withdraw' : IDL.Func([IDL.Vec(IDL.Nat8)], [IDL.Text], []),
+  const BlockIndex = IDL.Nat64;
+  const Tokens = IDL.Record({ 'e8s' : IDL.Nat64 });
+  const TransferError = IDL.Variant({
+    'TxTooOld' : IDL.Record({ 'allowed_window_nanos' : IDL.Nat64 }),
+    'BadFee' : IDL.Record({ 'expected_fee' : Tokens }),
+    'TxDuplicate' : IDL.Record({ 'duplicate_of' : BlockIndex }),
+    'TxCreatedInFuture' : IDL.Null,
+    'InsufficientFunds' : IDL.Record({ 'balance' : Tokens }),
   });
-  return TransferableNeurons;
+  const TransferResult = IDL.Variant({
+    'Ok' : BlockIndex,
+    'Err' : TransferError,
+  });
+  const NNSProposal = IDL.Service({
+    'balance' : IDL.Func([], [IDL.Nat64], []),
+    'submitNNSProposal' : IDL.Func(
+        [ProposalSubmission],
+        [SubmissionResult],
+        [],
+      ),
+    'userInfo' : IDL.Func([], [UserInfo], []),
+    'withdraw' : IDL.Func([IDL.Vec(IDL.Nat8)], [TransferResult], []),
+  });
+  return NNSProposal;
 };
 export const init = ({ IDL }) => { return []; };

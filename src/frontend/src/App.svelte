@@ -8,7 +8,7 @@
   import ProposalForm from "./components/ProposalForm.svelte";
   import Links from "./components/Links.svelte";
 
-  // Add fontawesome icons
+  // Add fontawesome Copy icon
   const icons = [faCopy];
   library.add(icons);
 </script>

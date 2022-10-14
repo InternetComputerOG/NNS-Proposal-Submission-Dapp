@@ -2,7 +2,6 @@
   import { AuthClient } from "@dfinity/auth-client";
   import { onMount } from "svelte";
   import { auth, createActor } from "../store/auth";
-  import { toHexString, hexToBytes, principalToAccountDefaultIdentifier } from '../utils/helpers';
 
   let client;
 

@@ -4,6 +4,35 @@ type UserInfo =
    balance: nat64;
    "principal": principal;
  };
+type TransferResult = 
+ variant {
+   Err: TransferError;
+   Ok: BlockIndex;
+ };
+type TransferError = 
+ variant {
+   BadFee: record {expected_fee: Tokens;};
+   InsufficientFunds: record {balance: Tokens;};
+   TxCreatedInFuture;
+   TxDuplicate: record {duplicate_of: BlockIndex;};
+   TxTooOld: record {allowed_window_nanos: nat64;};
+ };
+type Tokens = record {e8s: nat64;};
+type SubmissionResult = 
+ variant {
+   Err: SubmissionError;
+   Ok: SubmissionResponse;
+ };
+type SubmissionResponse = 
+ record {
+   block: nat64;
+   proposalId: nat64;
+ };
+type SubmissionError = 
+ record {
+   reason: text;
+   transferError: opt TransferError;
+ };
 type ProposalSubmission = 
  record {
    action: text;
@@ -15,10 +44,10 @@ type ProposalSubmission =
    title: text;
    url: text;
  };
+type BlockIndex = nat64;
 service : {
   balance: () -> (nat64);
-  isOwner: () -> (bool);
-  submitNNSProposal: (ProposalSubmission) -> (text);
+  submitNNSProposal: (ProposalSubmission) -> (SubmissionResult);
   userInfo: () -> (UserInfo);
-  withdraw: (vec nat8) -> (text);
+  withdraw: (vec nat8) -> (TransferResult);
 }
