@@ -44,7 +44,7 @@ Make sure you have [node.js](https://nodejs.org/) installed.
 
 ### How to get this repo
 
-To clone this repo without downloading the entire repository, run the following command:
+To clone this repo, run the following command:
 
 ```
 npx degit https://github.com/InternetComputerOG/NNS-Proposal-Submission-Dapp
