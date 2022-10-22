@@ -200,7 +200,7 @@ SUCCESS
   {/each}
   
   <h4>URL</h4>
-  We strongly encourage all that proposals include the URL to a coorresponding topic on the <a href="https://forum.dfinity.org/c/governance/" target="_blank">DFINITY Dev Forum</a> so that it can be discussed by the community during the voting phase.
+  We strongly encourage all that proposals include the URL to a coorresponding topic on the <a href="https://forum.dfinity.org/c/governance/" target="_blank">DFINITY Dev Forum</a>, and let the topic be discussed there for ~7 days before submitting it as a proposal. Most community participants will automatically vote no to any proposal which has not allowed enough time for deliberation, discussion, and involvement from the community prior to being published to the NNS.
   <input bind:value={proposal.url} class:error-highlight={errorHighlight.url}>
   
   <h4>Summary</h4>
