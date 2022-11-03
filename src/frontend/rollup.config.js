@@ -101,6 +101,7 @@ export default {
     inlineDynamicImports: true,
     name: "app",
     file: "public/build/bundle.js",
+    intro: 'var global = typeof self !== undefined ? self : this;',
   },
   plugins: [
     svelte({

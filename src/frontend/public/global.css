@@ -36,6 +36,7 @@ h6 {
 
 button {
   margin: 10px;
+  height: 36px;
   padding: 8px 32px;
   color: var(--color-black);
   background-color: white;
@@ -50,7 +51,7 @@ button {
 }
 
 button:disabled {
-  color:#161617;
+  color:#3b3b3b;
   background-color:grey;
 }
 

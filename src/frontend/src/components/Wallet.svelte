@@ -17,7 +17,6 @@
   let pendingWithdrawal = false;
   let pendingBalanceRefresh = false;
   let hideWithdrawForm = true;
-  let didCopyPrincipal = false;
   let didCopyDepositAddress = false;
 
   // UI Variables
@@ -70,16 +69,6 @@
     refreshBalance();
   }
 
-  function copyPrincipal(text) {
-    if(window.isSecureContext) {
-      didCopyPrincipal = true;
-      navigator.clipboard.writeText(text);
-    }
-    setTimeout(() => {
-      didCopyPrincipal = false
-    }, 3000)
-  };
-
   function copyDepositAddress(text) {
     if(window.isSecureContext) {
       didCopyDepositAddress = true;
@@ -96,16 +85,6 @@
   {#if fetchingUserInfo}
     <div class="loader"></div> Loading Your Wallet...
   {:else}
-    <div class="user-info">
-      <h4>Principal</h4>
-      {userPrincipal}
-      <span class="copy-icon" on:click={() => copyPrincipal(userPrincipal)}>
-        <FontAwesomeIcon icon="copy" />
-        {#if didCopyPrincipal}
-            Copied!
-        {/if}
-      </span>
-    </div>
 
     <div class="user-info">
       <h4>Deposit Address</h4>
